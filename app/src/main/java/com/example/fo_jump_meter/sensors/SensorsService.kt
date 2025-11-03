@@ -47,6 +47,7 @@ class SensorsService: Service() {
     }
 
     private fun start() {
+        isRunning = true
         if (serviceScope.isActive.not()) {
             serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         }
@@ -60,20 +61,37 @@ class SensorsService: Service() {
                 //TODO upload to a repository
             }
             .launchIn(serviceScope)
+
+        sensorsClient
+            .getSensorUpdates(
+                Sensor.TYPE_GYROSCOPE,
+                SensorManager.SENSOR_DELAY_FASTEST
+            )
+            .catch{e -> e.printStackTrace()}
+            .onEach {
+                //TODO upload to a repository
+            }
+            .launchIn(serviceScope)
     }
 
     private fun stop() {
         serviceScope.cancel()
         stopSelf()
+        isRunning = false
     }
 
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
+        isRunning = false
     }
 
     companion object {
         const val ACTION_START = "ACTION_START"
         const val ACTION_STOP = "ACTION_STOP"
+
+        @Volatile
+        var isRunning = false
+            private set
     }
 }
