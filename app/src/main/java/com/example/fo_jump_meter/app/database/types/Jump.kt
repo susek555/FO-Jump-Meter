@@ -1,0 +1,15 @@
+package com.example.fo_jump_meter.app.database.types
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
+
+@Entity(
+    tableName = "jumps"
+)
+data class Jump(
+    @PrimaryKey(autoGenerate = true)
+    var id: Long = 0,
+
+    //TODO
+)

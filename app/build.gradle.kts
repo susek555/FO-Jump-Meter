@@ -59,6 +59,9 @@ dependencies {
     implementation(libs.hilt)
     implementation(libs.hilt.navigation)
     ksp(libs.hilt.compiler)
+    implementation(libs.room.compiler)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
 
 
     testImplementation(libs.junit)
@@ -68,4 +71,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    configurations.all {
+        exclude(group = "com.intellij", module = "annotations")
+    }
 }
+
