@@ -62,6 +62,9 @@ dependencies {
     implementation(libs.room.compiler)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.material.icons.core)
+    implementation(libs.material.icons.extended)
+
 
 
     testImplementation(libs.junit)
