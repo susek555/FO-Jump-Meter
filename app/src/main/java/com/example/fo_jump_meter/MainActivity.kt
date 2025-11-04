@@ -11,15 +11,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.fo_jump_meter.app.di.databaseModule
+import com.example.fo_jump_meter.app.di.repositoryModule
+import com.example.fo_jump_meter.app.navigation.NavigationController
 import com.example.fo_jump_meter.sensors.SensorsService
 import com.example.fo_jump_meter.ui.theme.FOJumpMeterTheme
+import dagger.hilt.android.AndroidEntryPoint
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.logger.AndroidLogger
+import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var sensorsService: SensorsService
     private var isSensorsServiceBound: Boolean = false
@@ -65,13 +70,22 @@ class MainActivity : ComponentActivity() {
     //Main activity TODO
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        startKoin{
+            androidContext(this@MainActivity)
+            modules(databaseModule, repositoryModule)
+
+            logger(AndroidLogger(Level.DEBUG))
+        }
+
         enableEdgeToEdge()
         setContent {
             FOJumpMeterTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                    NavigationController(
+                        startSensorsService = { startSensorsService() },
+                        stopSensorsService =  { stopSensorsService() },
+                        innerPadding = innerPadding
                     )
                 }
             }
@@ -89,21 +103,5 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         stopSensorsService()
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    FOJumpMeterTheme {
-        Greeting("Android")
     }
 }

@@ -1,6 +1,9 @@
 package com.example.fo_jump_meter.app.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,13 +18,15 @@ import com.example.fo_jump_meter.app.screens.singleJump.SingleJumpViewModel
 @Composable
 fun NavigationController(
     startSensorsService: () -> Unit,
-    stopSensorsService: () -> Unit
+    stopSensorsService: () -> Unit,
+    innerPadding: PaddingValues
 ) {
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = "MainScreen"
+        startDestination = "MainScreen",
+        modifier = Modifier.padding(innerPadding)
     ){
         composable("MainScreen") { navBackStackEntry ->
             MainScreen(
