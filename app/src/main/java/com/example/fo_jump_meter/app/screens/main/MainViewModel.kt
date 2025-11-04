@@ -14,5 +14,12 @@ class MainViewModel @Inject constructor() : ViewModel(), KoinComponent {
     private val sensorsRepository: SensorsRepository by inject()
     private val jumpsRepository: JumpRepository by inject()
 
+    fun onEvent(event: MainScreenEvent){
+        when(event) {
+            MainScreenEvent.CancelJumpMeter -> TODO()
+            is MainScreenEvent.SaveJump -> TODO()
+            MainScreenEvent.StartJumpMeter -> TODO()
+        }
+    }
     //TODO
 }
