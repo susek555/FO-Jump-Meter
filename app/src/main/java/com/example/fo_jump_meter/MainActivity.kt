@@ -7,22 +7,17 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.example.fo_jump_meter.app.di.databaseModule
-import com.example.fo_jump_meter.app.di.repositoryModule
 import com.example.fo_jump_meter.app.navigation.NavigationController
 import com.example.fo_jump_meter.sensors.SensorsService
 import com.example.fo_jump_meter.ui.theme.FOJumpMeterTheme
 import dagger.hilt.android.AndroidEntryPoint
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.logger.AndroidLogger
-import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -45,7 +40,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnsafeIntentLaunch")
     override fun onStart() {
         super.onStart()
-        Intent(this, SensorsService::class.java).also {
+        Intent(this, SensorsService::class.java).also { intent ->
             bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
     }
@@ -58,6 +53,7 @@ class MainActivity : ComponentActivity() {
                 startService(this)
             }
         }
+        Toast.makeText(this, "Sensors updates started (Main activity)", Toast.LENGTH_SHORT).show()
     }
 
     private fun stopSensorsService()  {
@@ -67,16 +63,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    //Main activity TODO
+    //Main activity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        startKoin{
-            androidContext(this@MainActivity)
-            modules(databaseModule, repositoryModule)
-
-            logger(AndroidLogger(Level.DEBUG))
-        }
+//        startKoin{
+//            androidContext(this@MainActivity)
+//            modules(databaseModule, repositoryModule)
+//
+//            logger(AndroidLogger(Level.DEBUG))
+//        }
 
         enableEdgeToEdge()
         setContent {

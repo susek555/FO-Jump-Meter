@@ -1,6 +1,6 @@
 [versions]
 agp = "8.7.3"
-kotlin = "2.0.0"
+kotlin = "2.0.21"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -8,13 +8,14 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.9.4"
 activityCompose = "1.9.3"
 activityKtx = "1.9.3"
-composeBom = "2025.10.01"
-koin-android = "4.0.1"
+composeBom = "2024.09.02"
+#koin-android = "4.0.1"
 navigation = "2.9.2"
 hilt = "2.51"
 hiltNavigation = "1.2.0"
-ksp = "2.0.0-1.0.22"
-room = "2.7.2"
+ksp = "2.0.21-1.0.26"
+room = "2.6.1"
+kotlinx-metadata = "0.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,7 +34,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
-koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin-android" }
+#koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin-android" }
 androidx-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation"}
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt"}
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt"}
@@ -43,6 +44,7 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+kotlinx-metadata-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-metadata-jvm", version.ref = "kotlinx-metadata"}
 
 
 [plugins]

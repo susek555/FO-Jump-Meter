@@ -1,11 +1,13 @@
 package com.example.fo_jump_meter.app.repositories
 
 import com.example.fo_jump_meter.app.database.JumpsDao
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class JumpRepository: KoinComponent {
-    private val jumpsDao: JumpsDao by inject()
+@Singleton
+class JumpRepository @Inject constructor(
+    private var jumpsDao: JumpsDao
+)  {
 
     //TODO
 }

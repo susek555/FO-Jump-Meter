@@ -1,13 +1,30 @@
 package com.example.fo_jump_meter.app.di
 
+import android.content.Context
 import androidx.room.Room
+import com.example.fo_jump_meter.app.database.JumpsDao
 import com.example.fo_jump_meter.app.database.JumpsDatabase
-import org.koin.dsl.module
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
-val databaseModule = module {
-    single {
-        Room.databaseBuilder(get(), JumpsDatabase::class.java, "jumps_database")
-            .fallbackToDestructiveMigration(false)
+@Module
+@InstallIn(SingletonComponent::class)
+object DatabaseModule {
+
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): JumpsDatabase {
+        return Room.databaseBuilder(
+            context,
+            JumpsDatabase::class.java,
+            "jumps_database"
+        ).build()
     }
-    single { get<JumpsDatabase>().jumpsDao() }
+
+    @Provides
+    fun provideJumpsDao(db: JumpsDatabase): JumpsDao = db.jumpsDao()
 }

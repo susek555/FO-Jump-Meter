@@ -6,7 +6,11 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Binder
 import android.os.IBinder
+import android.widget.Toast
+import com.example.fo_jump_meter.app.data.SensorData
+import com.example.fo_jump_meter.app.repositories.SensorsRepository
 import com.gps_usage.sensors.DefaultSensorClient
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,13 +19,15 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SensorsService: Service() {
     private var serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private lateinit var sensorsClient: SensorsClient
     private val binder = SensorsBinder()
-    //    private val repository: SensorsRepository by inject()
-    //TODO make sensors repository
+
+    @Inject lateinit var repository: SensorsRepository
 
     inner class SensorsBinder: Binder() {
         fun getService(): SensorsService = this@SensorsService
@@ -54,22 +60,33 @@ class SensorsService: Service() {
         sensorsClient
             .getSensorUpdates(
                 Sensor.TYPE_ACCELEROMETER,
-                SensorManager.SENSOR_DELAY_FASTEST
+                SensorManager.SENSOR_DELAY_GAME
             )
             .catch{e -> e.printStackTrace()}
             .onEach {
-                //TODO upload to a repository
+                    event ->
+                val data = SensorData(
+                    sensorType = event.sensor.type,
+                    values = event.values,
+                    timestamp = event.timestamp
+                )
+                repository.updateAccelerometer(data)
             }
             .launchIn(serviceScope)
 
         sensorsClient
             .getSensorUpdates(
-                Sensor.TYPE_GYROSCOPE,
-                SensorManager.SENSOR_DELAY_FASTEST
+                Sensor.TYPE_ROTATION_VECTOR,
+                SensorManager.SENSOR_DELAY_GAME
             )
             .catch{e -> e.printStackTrace()}
-            .onEach {
-                //TODO upload to a repository
+            .onEach { event ->
+                val data = SensorData(
+                    sensorType = event.sensor.type,
+                    values = event.values,
+                    timestamp = event.timestamp
+                )
+                repository.updateRotationVector(data)
             }
             .launchIn(serviceScope)
     }

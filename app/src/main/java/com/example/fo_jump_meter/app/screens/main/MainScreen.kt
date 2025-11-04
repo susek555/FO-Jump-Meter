@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -34,11 +35,8 @@ fun MainScreen(
         }
     }
 
-//    val acceleration by viewModel.acceleratorFlow.collectAsState()
-//    val orientation by viewModel.gyroscopeFlow.collectAsState()
-
-    val acceleration = 0
-    val orientation = 0
+    val acceleration by viewModel.accelerometerFlow.collectAsState()
+    val orientation by viewModel.rotationVectorFlow.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize().padding(20.dp)
@@ -57,6 +55,26 @@ fun MainScreen(
                 text = "ACCELERATION",
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .offset(x = 0.dp, y = (-140).dp),
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+            )
+            Text(
+                text = acceleration.values.contentToString(),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .offset(x = 0.dp, y = (-100).dp),
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+            )
+            Text(
+                text = "ROTATION",
+                modifier = Modifier
+                    .align(Alignment.Center)
                     .offset(x = 0.dp, y = (-20).dp),
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
@@ -64,27 +82,7 @@ fun MainScreen(
                 )
             )
             Text(
-                text = acceleration.toString(),
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(x = 0.dp, y = 20.dp),
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-            )
-            Text(
-                text = "ORIENTATION",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(x = 0.dp, y = (-20).dp),
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-            )
-            Text(
-                text = orientation.toString(),
+                text = orientation.values.contentToString(),
                 modifier = Modifier
                     .align(Alignment.Center)
                     .offset(x = 0.dp, y = 20.dp),

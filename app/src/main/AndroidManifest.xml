@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:name=".JumpMeterApp"
         android:allowBackup="true"
@@ -13,6 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FOJumpMeter"
         tools:targetApi="31">
+        <service android:name=".sensors.SensorsService" android:foregroundServiceType="health"
+            tools:ignore="ForegroundServicePermission" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

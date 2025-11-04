@@ -54,7 +54,7 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation(libs.androidx.activity.ktx)
-    implementation(libs.koin.android)
+//    implementation(libs.koin.android)
     implementation(libs.androidx.navigation)
     implementation(libs.hilt)
     implementation(libs.hilt.navigation)
@@ -62,10 +62,10 @@ dependencies {
     implementation(libs.room.compiler)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
     implementation(libs.material.icons.core)
     implementation(libs.material.icons.extended)
-
-
+    implementation(libs.kotlinx.metadata.jvm)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
