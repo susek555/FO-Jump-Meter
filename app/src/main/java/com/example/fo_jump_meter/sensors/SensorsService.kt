@@ -59,7 +59,7 @@ class SensorsService: Service() {
         }
         sensorsClient
             .getSensorUpdates(
-                Sensor.TYPE_ACCELEROMETER,
+                Sensor.TYPE_LINEAR_ACCELERATION,
                 SensorManager.SENSOR_DELAY_GAME
             )
             .catch{e -> e.printStackTrace()}
@@ -76,7 +76,7 @@ class SensorsService: Service() {
 
         sensorsClient
             .getSensorUpdates(
-                Sensor.TYPE_ROTATION_VECTOR,
+                Sensor.TYPE_GAME_ROTATION_VECTOR,
                 SensorManager.SENSOR_DELAY_GAME
             )
             .catch{e -> e.printStackTrace()}
