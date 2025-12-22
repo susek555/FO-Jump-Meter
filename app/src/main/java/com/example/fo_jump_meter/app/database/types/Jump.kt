@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 data class Jump(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
-
-    //TODO
+    var height: Double,
+    var airTime: Long,
+    var date: Long,
 )
