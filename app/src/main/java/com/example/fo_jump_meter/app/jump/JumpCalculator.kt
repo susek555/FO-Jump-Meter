@@ -33,11 +33,11 @@ class JumpCalculator {
                 currentVelocity = 0.0
             }
         } else {
-            if (acc < 0.5) {
-                acc -= SensorManager.GRAVITY_EARTH
-            } else if (detectLanding(acc)) {
+            if (detectLanding(acc)) {
                 isJumping = false
                 reset()
+            } else if (acc < 2.0) {
+                acc = (-1) * SensorManager.GRAVITY_EARTH
             }
         }
         computeVerlet(acc, dt)
