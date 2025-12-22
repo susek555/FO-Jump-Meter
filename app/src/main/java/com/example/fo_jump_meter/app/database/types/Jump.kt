@@ -2,7 +2,6 @@ package com.example.fo_jump_meter.app.database.types
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "jumps"
