@@ -1,8 +1,11 @@
 package com.example.fo_jump_meter.app.screens.main
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -12,10 +15,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.Locale
 
 @Composable
 fun MainScreen(
@@ -25,6 +30,7 @@ fun MainScreen(
     viewModel: MainViewModel
 ) {
     val isServiceRunning by viewModel.isSensorsServiceOn.collectAsState()
+    val jumpData by viewModel.jumpDataFlow.collectAsState()
 
     LaunchedEffect(isServiceRunning) {
         if(isServiceRunning) {
@@ -34,88 +40,106 @@ fun MainScreen(
         }
     }
 
-    val acceleration by viewModel.accelerometerFlow.collectAsState()
-    val orientation by viewModel.rotationVectorFlow.collectAsState()
-
     Box(
-        modifier = Modifier.fillMaxSize().padding(20.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
     ) {
         Button(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .offset(x = 0.dp, y = 20.dp),
+            modifier = Modifier.align(Alignment.TopEnd),
             onClick = displayRecordsScreen
         ){
             Text("My records")
         }
 
         if (isServiceRunning) {
-            Text(
-                text = "ACCELERATION",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(x = 0.dp, y = (-140).dp),
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                DataDisplayItem(
+                    label = "HEIGHT",
+                    value = jumpData[0],
+                    unit = "m",
+                    isMainMetric = true
                 )
-            )
-            Text(
-                text = acceleration.values.contentToString(),
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(x = 0.dp, y = (-100).dp),
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                DataDisplayItem(
+                    label = "VELOCITY",
+                    value = jumpData[1],
+                    unit = "m/s"
                 )
-            )
-            Text(
-                text = "ROTATION",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(x = 0.dp, y = (-20).dp),
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                DataDisplayItem(
+                    label = "ACCELERATION",
+                    value = jumpData[2],
+                    unit = "m/s²"
                 )
-            )
-            Text(
-                text = orientation.values.contentToString(),
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset(x = 0.dp, y = 20.dp),
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-            )
+            }
+
             StopButton(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(x = 0.dp, y = (-100).dp),
+                    .padding(bottom = 50.dp),
                 onClick = {
                     viewModel.onEvent(MainScreenEvent.SaveJump)
                 }
             )
         } else {
-            Text(
-                text = "Click to measure jump",
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(x = 0.dp, y = 60.dp)
-            )
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Ready to Jump?",
+                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Click button below to start measurement",
+                    color = Color.Gray
+                )
+            }
+
             StartButton(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(x = 0.dp, y = (-100).dp),
+                    .padding(bottom = 50.dp),
                 onClick = {
                     viewModel.onEvent(MainScreenEvent.StartJumpMeter)
                 }
             )
         }
     }
-
-    //TODO add dialog with info how to measure a jump
 }
 
+@Composable
+fun DataDisplayItem(
+    label: String,
+    value: Float,
+    unit: String,
+    isMainMetric: Boolean = false
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = label,
+            style = TextStyle(
+                fontWeight = FontWeight.Light,
+                fontSize = if (isMainMetric) 20.sp else 14.sp,
+                color = Color.Gray
+            )
+        )
+        Text(
+            text = String.format(Locale.US, "%.2f %s", value, unit),
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = if (isMainMetric) 48.sp else 24.sp
+            )
+        )
+    }
+}
