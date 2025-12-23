@@ -23,10 +23,8 @@ class MainViewModel @Inject constructor(
 
     private val jumpCalculator = JumpCalculator()
     private val _accelerometerFlow = MutableStateFlow(SensorData())
-    val accelerometerFlow: StateFlow<SensorData> get() = _accelerometerFlow
 
     private val _rotationVectorFlow = MutableStateFlow(SensorData())
-    val rotationVectorFlow: StateFlow<SensorData> get() = _rotationVectorFlow
 
     private val _isSensorsServiceOn = MutableStateFlow(false)
     val isSensorsServiceOn: StateFlow<Boolean> get() = _isSensorsServiceOn
