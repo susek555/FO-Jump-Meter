@@ -27,4 +27,8 @@ object DatabaseModule {
 
     @Provides
     fun provideJumpsDao(db: JumpsDatabase): JumpsDao = db.jumpsDao()
+
+    @Provides
+    fun provideSnapshotsDao(db: JumpsDatabase) = db.snapshotsDao()
+
 }
