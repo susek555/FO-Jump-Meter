@@ -2,6 +2,7 @@ package com.example.fo_jump_meter.app.screens.records
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fo_jump_meter.app.database.types.Jump
 import com.example.fo_jump_meter.app.repositories.JumpRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,5 +23,12 @@ class RecordsViewModel @Inject constructor(
             _jumps.emit(jumpsRepository.getJumps())
         }
 
+    }
+
+    fun deleteJump(jump: Jump) {
+        viewModelScope.launch  {
+            jumpsRepository.deleteJump(jump)
+            _jumps.emit(jumpsRepository.getJumps())
+        }
     }
 }

@@ -29,4 +29,17 @@ class JumpRepository @Inject constructor(
     suspend fun getJumps(): List<Jump> {
         return jumpsDao.getAllJumps()
     }
+
+    suspend fun deleteJump(jump: Jump) {
+        return jumpsDao.deleteJump(jump)
+
+    }
+
+    suspend fun getJumpById(id: Long): Jump? {
+        return jumpsDao.getJumpById(id)
+    }
+
+    suspend fun getSnapshotsByJumpId(jumpId: Long): List<Snapshot> {
+        return jumpsDao.getSnapshotsByJumpId(jumpId)
+    }
 }
