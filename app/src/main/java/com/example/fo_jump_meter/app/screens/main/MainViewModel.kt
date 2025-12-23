@@ -2,7 +2,8 @@ package com.example.fo_jump_meter.app.screens.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.fo_jump_meter.app.data.SensorData
+import com.example.fo_jump_meter.app.database.types.Jump
+import com.example.fo_jump_meter.app.database.types.Snapshot
 import com.example.fo_jump_meter.app.jump.JumpCalculator
 import com.example.fo_jump_meter.app.repositories.JumpRepository
 import com.example.fo_jump_meter.app.repositories.SensorsRepository
@@ -17,14 +18,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val sensorsRepository: SensorsRepository,
+    sensorsRepository: SensorsRepository,
     private val jumpsRepository: JumpRepository
 ) : ViewModel() {
 
     private val jumpCalculator = JumpCalculator()
-    private val _accelerometerFlow = MutableStateFlow(SensorData())
-
-    private val _rotationVectorFlow = MutableStateFlow(SensorData())
 
     private val _isSensorsServiceOn = MutableStateFlow(false)
     val isSensorsServiceOn: StateFlow<Boolean> get() = _isSensorsServiceOn
@@ -32,17 +30,10 @@ class MainViewModel @Inject constructor(
     private val _jumpDataFlow = MutableStateFlow(floatArrayOf(0f, 0f, 0f))
     val jumpDataFlow: StateFlow<FloatArray> get() = _jumpDataFlow
 
+    var snapshots = mutableListOf<Snapshot>()
+
+
     init {
-        viewModelScope.launch {
-            sensorsRepository.accelerometerFlow.collect { data ->
-                _accelerometerFlow.emit(data)
-            }
-        }
-        viewModelScope.launch {
-            sensorsRepository.rotationVectorFlow.collect { data ->
-                _rotationVectorFlow.emit(data)
-            }
-        }
         combine(
             sensorsRepository.accelerometerFlow,
             sensorsRepository.rotationVectorFlow
@@ -58,7 +49,16 @@ class MainViewModel @Inject constructor(
             }
         }
             .onEach { result ->
-                _jumpDataFlow.emit(result)
+                if (_isSensorsServiceOn.value) {
+                    snapshots += Snapshot(
+                        height = result[0],
+                        velocity = result[1],
+                        acceleration = result[2],
+                        timestamp = System.currentTimeMillis(),
+                        jumpId = 0
+                    )
+                    _jumpDataFlow.emit(result)
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -67,11 +67,15 @@ class MainViewModel @Inject constructor(
         when(event) {
             MainScreenEvent.SaveJump -> {
                 _isSensorsServiceOn.value = false
-                //TODO
+                viewModelScope.launch {
+                    val jump = Jump(0,0.0,0,0)
+                    jumpsRepository.saveJumpWithSnapshots(jump, snapshots)
+                }
             }
             MainScreenEvent.StartJumpMeter -> {
                 _isSensorsServiceOn.value = true
-                //TODO
+                jumpCalculator.reset()
+                snapshots.clear()
             }
         }
     }
