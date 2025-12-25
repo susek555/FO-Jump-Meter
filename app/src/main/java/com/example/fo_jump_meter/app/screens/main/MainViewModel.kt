@@ -22,11 +22,14 @@ class MainViewModel @Inject constructor(
     private val jumpsRepository: JumpRepository
 ) : ViewModel() {
 
-    private val jumpCalculator = JumpCalculator()
+
 
     private val _isSensorsServiceOn = MutableStateFlow(false)
     val isSensorsServiceOn: StateFlow<Boolean> get() = _isSensorsServiceOn
 
+    private val jumpCalculator = JumpCalculator{
+        onEvent(MainScreenEvent.SaveJump)
+    }
     private val _jumpDataFlow = MutableStateFlow(floatArrayOf(0f, 0f, 0f))
     val jumpDataFlow: StateFlow<FloatArray> get() = _jumpDataFlow
 
@@ -67,6 +70,13 @@ class MainViewModel @Inject constructor(
         when(event) {
             MainScreenEvent.SaveJump -> {
                 _isSensorsServiceOn.value = false
+                snapshots += Snapshot(
+                    height = 0f,
+                    velocity = 0f,
+                    acceleration = 0f,
+                    timestamp = System.currentTimeMillis(),
+                    jumpId = 0
+                )
                 viewModelScope.launch {
                     val jump = Jump(0,0.0,0,0)
                     jumpsRepository.saveJumpWithSnapshots(jump, snapshots)

@@ -3,7 +3,9 @@ package com.example.fo_jump_meter.app.jump
 import android.hardware.SensorManager
 import kotlin.math.abs
 
-class JumpCalculator {
+class JumpCalculator(
+    private val stopJump: () -> Unit
+) {
     private var currentHeight: Double = 0.0
     private var currentVelocity: Double = 0.0
     private var currentAcceleration: Double = 0.0
@@ -74,6 +76,7 @@ class JumpCalculator {
                     softReset()
                     hasLanded = true
                     currentHeight = 0.0
+                    stopJump()
                 } else {
                     acc = -9.81f
                 }
