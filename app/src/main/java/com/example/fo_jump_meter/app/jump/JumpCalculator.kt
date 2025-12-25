@@ -61,7 +61,7 @@ class JumpCalculator {
                     idleCounter = 0
                 }
                 time = timestamp
-                return floatArrayOf(0.0f, 0.0f, 0.0f)
+                return floatArrayOf(currentHeight.toFloat(), 0.0f, 0.0f)
             } else {
                 idleCounter = 0
                 jumpStartCounter = 0
@@ -73,6 +73,7 @@ class JumpCalculator {
                     isInAir = false
                     softReset()
                     hasLanded = true
+                    currentHeight = 0.0
                 } else {
                     acc = -9.81f
                 }
