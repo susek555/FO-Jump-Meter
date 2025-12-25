@@ -3,13 +3,23 @@ package com.example.fo_jump_meter.app.jump
 import android.hardware.SensorManager
 import kotlin.math.abs
 
-
 class JumpCalculator {
-    private var currentHeight: Double = 0.0 // initial height is set to 0
-    private var currentVelocity: Double = 0.0 // initial speed is set to 0
-    private var currentAcceleration: Double = 0.0 // initial acceleration is set to 0
-    private var time: Long = 0 // initial time is set to 0
-    var isJumping = false
+    private var currentHeight: Double = 0.0
+    private var currentVelocity: Double = 0.0
+    private var currentAcceleration: Double = 0.0
+    private var time: Long = 0
+
+    private var calibrationOffset = 0.0f
+    private var calibrationFrameCount = 0
+    private val FRAMES_TO_CALIBRATE = 50
+    private var isCalibrated = false
+    private var jumpStartCounter = 0
+    private var idleCounter = 0
+    private val FRAMES_TO_START_JUMP = 5
+    private val FRAMES_TO_SOFT_RESET = 5
+    private var isJumping = false
+    private var isInAir = false
+    private var hasLanded = false
 
     fun calculateZAxisAcceleration(acceleration: FloatArray, rotation: FloatArray): Float{
         val rotationMatrix = FloatArray(9)
@@ -19,48 +29,97 @@ class JumpCalculator {
     }
 
     fun calculate(acceleration: FloatArray, rotation: FloatArray, timestamp: Long): FloatArray {
-        val dt = (timestamp - time)
+        var acc = calculateZAxisAcceleration(acceleration, rotation)
+        if (!isCalibrated) {
+            calibrationOffset += acc
+            calibrationFrameCount++
+            if (calibrationFrameCount >= FRAMES_TO_CALIBRATE) {
+                calibrationOffset /= FRAMES_TO_CALIBRATE
+                isCalibrated = true
+            }
+            time = timestamp
+            return floatArrayOf(0.0f, 0.0f, 0.0f)
+        }
+        acc -= calibrationOffset
         if (time == 0L) {
             time = timestamp
             return floatArrayOf(0.0f, 0.0f, 0.0f)
         }
-        var acc = calculateZAxisAcceleration(acceleration, rotation)
+        val dt = (timestamp - time)
         if (!isJumping) {
-            if (acc > 3.0) {
-                isJumping = true
+            if (acc > 3.0f) {
+                jumpStartCounter++
+                if (jumpStartCounter >= FRAMES_TO_START_JUMP) {
+                    isJumping = true
+                    isInAir = false
+                }
+                idleCounter = 0
+            } else if (abs(acc) < 0.5f) {
+                idleCounter++
+                if (idleCounter > FRAMES_TO_SOFT_RESET) {
+                    softReset()
+                    idleCounter = 0
+                }
+                time = timestamp
+                return floatArrayOf(0.0f, 0.0f, 0.0f)
             } else {
-                acc = 0.0f
-                currentVelocity = 0.0
+                idleCounter = 0
+                jumpStartCounter = 0
             }
         } else {
-            if (detectLanding(acc)) {
-                isJumping = false
-                reset()
-            } else if (acc < 2.0) {
-                acc = (-1) * SensorManager.GRAVITY_EARTH
+            if (isInAir){
+                if (detectLanding(acc)) {
+                    isJumping = false
+                    isInAir = false
+                    softReset()
+                    hasLanded = true
+                } else {
+                    acc = -9.81f
+                }
+            } else {
+                if (detectTakeoff(acc)) {
+                    isInAir = true
+                    acc = -9.81f
+                }
             }
         }
-        computeVerlet(acc, dt)
+        if (!hasLanded) {
+            computeVerlet(acc, dt)
+        }
         val result = floatArrayOf(currentHeight.toFloat(), currentVelocity.toFloat(), currentAcceleration.toFloat())
         time = timestamp
         return result
-
     }
-
     fun detectLanding(acc: Float): Boolean {
-        return (abs(acc) > 3.0 && currentVelocity < 0.0) || currentHeight <= 0.0
+        return (currentVelocity < -0.5 && abs(acc) > 10.0) || currentHeight <= 0.0
     }
-    
+
+    fun detectTakeoff(acc: Float): Boolean {
+        return (acc < 0.2f)
+    }
+
     fun computeVerlet(acc: Float, dt: Long) {
-        val dtInSeconds = dt / 1000000000.0
+        val dtInSeconds = dt / 1_000_000_000.0
         currentHeight += currentVelocity * dtInSeconds + 0.5 * currentAcceleration * dtInSeconds * dtInSeconds
         currentVelocity += (currentAcceleration + acc) * dtInSeconds / 2
         currentAcceleration = acc.toDouble()
     }
 
+    private fun softReset() {
+//        currentHeight = 0.0
+        currentVelocity = 0.0
+        currentAcceleration = 0.0
+        jumpStartCounter = 0
+        isInAir = false
+    }
+
     fun reset() {
         currentHeight = 0.0
         currentVelocity = 0.0
+        currentAcceleration = 0.0
         time = 0
+        jumpStartCounter = 0
+        isInAir = false
+        hasLanded = false
     }
 }
