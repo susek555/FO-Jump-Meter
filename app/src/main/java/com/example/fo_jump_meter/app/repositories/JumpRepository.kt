@@ -13,17 +13,30 @@ class JumpRepository @Inject constructor(
     private var snapshotsDao: SnapshotsDao
 )  {
     suspend fun saveJumpWithSnapshots (jump: Jump, snapshots: List<Snapshot>) {
-        val height = snapshots.maxOfOrNull { it.height } ?: 0f
-        val airTime =
-            (snapshots.maxOfOrNull { it.timestamp } ?: 0) - (snapshots.minOfOrNull { it.timestamp } ?: 0)
+        val firstJumpFrameIndex =
+            snapshots.indexOfFirst { it.height !=  0.0f } - 1
+        val filteredSnapshots = snapshots.filterIndexed {
+            index, _ -> index >= firstJumpFrameIndex
+        }
+        val height = filteredSnapshots.maxOfOrNull { it.height } ?: 0f
+        var airTime =
+            (filteredSnapshots.maxOfOrNull { it.timestamp } ?: 0L) - (filteredSnapshots
+                .asSequence()
+                .zipWithNext()
+                .filter{(_, s2)-> s2.height>0}
+                .map { (s1, _) -> (s1.timestamp) }
+                .minOrNull() ?: 0L)
+        if (height <= 0.0f) {
+            airTime = 0L
+        }
         jump.height = height.toDouble()
         jump.airTime = airTime
         jump.date = System.currentTimeMillis()
         val jumpId = jumpsDao.insertJump(jump)
-        snapshots.forEach { snapshot ->
+        filteredSnapshots.forEach { snapshot ->
             snapshot.jumpId = jumpId
         }
-        snapshotsDao.insertSnapshots(snapshots)
+        snapshotsDao.insertSnapshots(filteredSnapshots)
     }
 
     suspend fun getJumps(): List<Jump> {
