@@ -53,7 +53,10 @@ class MainViewModel @Inject constructor(
     val stopJumpDialogConfig: DialogConfig? =
         dialogFactory.create(
             state = DialogConfigState.InputJumpName,
-            onConfirm = { name -> saveJump(name!!) },
+            onConfirm = { name ->
+                saveJump(name!!)
+                _isStopJumpDialogOpen.value = false
+            },
             onDismiss = { _isStopJumpDialogOpen.value = false }
         )
 

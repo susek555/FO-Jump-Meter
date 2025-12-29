@@ -78,11 +78,18 @@ fun RecordsScreen(
                             Column(modifier = Modifier.padding(16.dp)) {
                                 val dateString = formatter.format(jump.date)
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                    Text(
-                                        text = dateString,
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
+                                    Column() {
+                                        Text(
+                                            text = dateString,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
+                                        Text(
+                                            text = jump.name,
+                                            style = MaterialTheme.typography.headlineSmall,
+                                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                                        )
+                                    }
                                     IconButton(onClick = { viewModel.deleteJump(jump) }) {
                                         Icon(
                                             imageVector = Icons.Default.Delete,
@@ -90,8 +97,7 @@ fun RecordsScreen(
                                         )
                                     }
                                 }
-
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(2.dp))
                                 Row(
                                     verticalAlignment = androidx.compose.ui.Alignment.Bottom
                                 ) {

@@ -22,7 +22,7 @@ object DatabaseModule {
             context,
             JumpsDatabase::class.java,
             "jumps_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
