@@ -12,4 +12,6 @@ data class Jump(
     var height: Double,
     var airTime: Long,
     var date: Long,
+    var name: String,
+    var weight: Short
 )

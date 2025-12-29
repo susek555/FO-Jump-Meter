@@ -104,7 +104,7 @@ class MainViewModel @Inject constructor(
 
     private fun saveJump(name: String) {
         viewModelScope.launch {
-            val jump = Jump(0,0.0,0,0)
+            val jump = Jump(0,0.0,0,0, name, 0)
             jumpsRepository.saveJumpWithSnapshots(jump, snapshots)
         }
     }
