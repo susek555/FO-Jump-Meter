@@ -8,11 +8,16 @@ import com.example.fo_jump_meter.app.jump.JumpCalculator
 import com.example.fo_jump_meter.app.repositories.JumpRepository
 import com.example.fo_jump_meter.app.repositories.SensorsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,13 +32,61 @@ class MainViewModel @Inject constructor(
     private val _isSensorsServiceOn = MutableStateFlow(false)
     val isSensorsServiceOn: StateFlow<Boolean> get() = _isSensorsServiceOn
 
+    private val _isCountdownRunning = MutableStateFlow(false)
+    val isCountdownRunning: StateFlow<Boolean> get() = _isCountdownRunning
+
     private val jumpCalculator = JumpCalculator{
         onEvent(MainScreenEvent.SaveJump)
     }
     private val _jumpDataFlow = MutableStateFlow(floatArrayOf(0f, 0f, 0f))
     val jumpDataFlow: StateFlow<FloatArray> get() = _jumpDataFlow
 
-    var snapshots = mutableListOf<Snapshot>()
+    private var snapshots = mutableListOf<Snapshot>()
+
+    // timer
+    private var startTime: Long? = null
+    private val _remainingTime = MutableStateFlow<Long>(5)
+    val remainingTime: StateFlow<Long> get() = _remainingTime
+
+    private val _events = MutableSharedFlow<UiEvent>()
+    val events = _events.asSharedFlow()
+
+    private var timerJob: Job? = null
+
+    private fun startTimer() {
+        startTime = System.currentTimeMillis()
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            while (isActive) {
+                val elapsedSeconds = (System.currentTimeMillis() - startTime!!) / 1000
+                val timeLeft = 5 - elapsedSeconds
+                _remainingTime.value = timeLeft
+
+                if (timeLeft <= 0) {
+                    break
+                }
+                delay(1000)
+            }
+            _events.emit(UiEvent.PlaySound)
+            delay(500)
+            _isCountdownRunning.value = false
+            startJump()
+            stopTimer()
+        }
+    }
+
+    private fun stopTimer() {
+        timerJob?.cancel()
+        timerJob = null
+        startTime = null
+        _remainingTime.value = 5
+    }
+
+    private fun startJump() {
+        _isSensorsServiceOn.value = true
+        jumpCalculator.reset()
+        snapshots.clear()
+    }
 
 
     init {
@@ -83,11 +136,13 @@ class MainViewModel @Inject constructor(
                 }
             }
             MainScreenEvent.StartJumpMeter -> {
-                _isSensorsServiceOn.value = true
-                jumpCalculator.reset()
-                snapshots.clear()
+                _isCountdownRunning.value = true
+                startTimer()
             }
         }
     }
-    //TODO
+}
+
+sealed class UiEvent {
+    data object PlaySound : UiEvent()
 }
