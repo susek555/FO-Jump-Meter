@@ -98,10 +98,26 @@ class SingleJumpViewModel @Inject constructor(
     }
 
     private suspend fun saveWeight(weight: Short) {
-        _jump.value?.let { jump ->
-            jumpsRepository.updateJump(
-                jump.copy(weight = weight)
-            )
-        }
+        val currentJump = _jump.value ?: return
+        val updatedJump = currentJump.copy(weight = weight)
+        jumpsRepository.updateJump(updatedJump)
+        _jump.emit(updatedJump)
     }
+
+    val work: StateFlow<Float?> = combine(_jump, _snapshots) { jump, snapshots ->
+        if (jump == null || jump.weight.toInt() == 0 || snapshots.isEmpty()) {
+            return@combine null
+        }
+
+        val maxHeight = snapshots.maxOf { it.height }
+        val minHeight = snapshots.minOf { it.height }
+        val totalDeltaH = maxHeight - minHeight
+        val g = 9.81f
+
+        jump.weight * g * totalDeltaH
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 }
