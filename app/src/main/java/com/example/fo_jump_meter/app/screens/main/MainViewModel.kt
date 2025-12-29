@@ -83,7 +83,7 @@ class MainViewModel @Inject constructor(
                 delay(1000)
             }
             _events.emit(UiEvent.PlaySound)
-            delay(500)
+//            delay(500)
             _isCountdownRunning.value = false
             startJump()
             stopTimer()
@@ -98,9 +98,9 @@ class MainViewModel @Inject constructor(
     }
 
     private fun startJump() {
-        _isSensorsServiceOn.value = true
         jumpCalculator.reset()
         snapshots.clear()
+        _isSensorsServiceOn.value = true
     }
 
     private fun saveJump(name: String) {

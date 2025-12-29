@@ -51,7 +51,7 @@ class JumpRepository @Inject constructor(
         return jumpsDao.updateJump(jump)
     }
 
-    suspend fun getJumpById(id: Long): Jump? {
+    suspend fun getJumpById(id: Long): Jump {
         return jumpsDao.getJumpById(id)
     }
 
