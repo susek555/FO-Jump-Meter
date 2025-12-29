@@ -30,8 +30,6 @@ class MainViewModel @Inject constructor(
     private val jumpsRepository: JumpRepository
 ) : ViewModel() {
 
-
-
     private val _isSensorsServiceOn = MutableStateFlow(false)
     val isSensorsServiceOn: StateFlow<Boolean> get() = _isSensorsServiceOn
 

@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fo_jump_meter.app.database.types.Jump
 import com.example.fo_jump_meter.app.database.types.Snapshot
+import com.example.fo_jump_meter.app.dialogFactory.DialogConfig
+import com.example.fo_jump_meter.app.dialogFactory.DialogConfigState
+import com.example.fo_jump_meter.app.dialogFactory.DialogFactory
 import com.example.fo_jump_meter.app.repositories.JumpRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,6 +56,21 @@ class SingleJumpViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
+    //dialog
+    private val dialogFactory = DialogFactory()
+    private val _isInputWeightDialogOpen = MutableStateFlow(false)
+    val isInputWeightDialogOpen: StateFlow<Boolean> get() = _isInputWeightDialogOpen
+    val isInputWeightDialogConfig: DialogConfig? =
+        dialogFactory.create(
+            state = DialogConfigState.InputWeight,
+            onConfirm = { weight ->
+                viewModelScope.launch {
+                    saveWeight(weight!!.toShort())
+                }
+                _isInputWeightDialogOpen.value = false
+            },
+            onDismiss = { _isInputWeightDialogOpen.value = false }
+        )
 
     init {
         loadJump()
@@ -75,4 +93,15 @@ class SingleJumpViewModel @Inject constructor(
         _chartType.value = type
     }
 
+    fun inputWeight() {
+        _isInputWeightDialogOpen.value = true
+    }
+
+    private suspend fun saveWeight(weight: Short) {
+        _jump.value?.let { jump ->
+            jumpsRepository.updateJump(
+                jump.copy(weight = weight)
+            )
+        }
+    }
 }

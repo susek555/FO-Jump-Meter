@@ -1,5 +1,6 @@
 package com.example.fo_jump_meter.app.screens.singleJump
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Height
 import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,8 +26,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.fo_jump_meter.app.dialogFactory.Dialog
 import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +43,9 @@ fun SingleJumpScreen(
     val chartPoints by viewModel.chartPoints.collectAsState()
     val selectedType by viewModel.chartType.collectAsState()
     val types = ChartType.entries
+
+    //dialog
+    val isInputWeightDialogOpen by viewModel.isInputWeightDialogOpen.collectAsState()
 
     val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm")
     Scaffold (
@@ -60,7 +68,7 @@ fun SingleJumpScreen(
         } else {
             Column(
                 modifier = Modifier.padding(innerPadding).fillMaxWidth().padding(16.dp),
-                horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = formatter.format(jump!!.date),
@@ -69,7 +77,7 @@ fun SingleJumpScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Height,
@@ -80,7 +88,7 @@ fun SingleJumpScreen(
                     Text(
                         text = "%.2fm".format(jump!!.height),
                         style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                        fontWeight = FontWeight.Bold
                     )
 
                     Spacer(modifier = Modifier.width(24.dp))
@@ -108,7 +116,36 @@ fun SingleJumpScreen(
                     points = chartPoints,
                     modifier = Modifier.fillMaxWidth().height(300.dp)
                 )
+                Spacer(modifier = Modifier.width(20.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ){
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
+                        Text(
+                            text = "Weight"
+                        )
+                        if (jump!!.weight.toInt() == 0) {
+                            Button(
+                                onClick = {
+                                    viewModel.inputWeight()
+                                }
+                            ){
+                                Text("Enter weight")
+                            }
+                        } else {
+                            Text(
+                                text = jump!!.weight.toString(),
+                            )
+                        }
+                    }
+                }
             }
         }
+    }
+    if(isInputWeightDialogOpen){
+        Dialog(viewModel.isInputWeightDialogConfig!!)
     }
 }

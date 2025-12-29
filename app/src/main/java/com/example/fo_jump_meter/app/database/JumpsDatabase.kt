@@ -7,7 +7,7 @@ import com.example.fo_jump_meter.app.database.types.Snapshot
 
 @Database(
     entities = [Jump::class, Snapshot::class],
-    version = 2
+    version = 4
 )
 abstract class JumpsDatabase: RoomDatabase() {
     abstract fun jumpsDao(): JumpsDao
