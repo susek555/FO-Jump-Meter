@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fo_jump_meter.R
+import com.example.fo_jump_meter.app.dialogFactory.Dialog
 import java.util.Locale
 
 @Composable
@@ -39,6 +40,9 @@ fun MainScreen(
     val jumpData by viewModel.jumpDataFlow.collectAsState()
     val isCountdownRunning by viewModel.isCountdownRunning.collectAsState()
     val remainingTime by viewModel.remainingTime.collectAsState()
+
+    //dialog
+    val isStopJumpDialogOpen by viewModel.isStopJumpDialogOpen.collectAsState()
 
     //sound
     val context = LocalContext.current
@@ -164,6 +168,9 @@ fun MainScreen(
                 }
             )
         }
+    }
+    if(isStopJumpDialogOpen){
+        Dialog(viewModel.stopJumpDialogConfig!!)
     }
 }
 

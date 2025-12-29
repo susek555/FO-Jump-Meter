@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fo_jump_meter.app.database.types.Jump
 import com.example.fo_jump_meter.app.database.types.Snapshot
+import com.example.fo_jump_meter.app.dialogFactory.DialogConfig
+import com.example.fo_jump_meter.app.dialogFactory.DialogConfigState
+import com.example.fo_jump_meter.app.dialogFactory.DialogFactory
 import com.example.fo_jump_meter.app.jump.JumpCalculator
 import com.example.fo_jump_meter.app.repositories.JumpRepository
 import com.example.fo_jump_meter.app.repositories.SensorsRepository
@@ -42,6 +45,17 @@ class MainViewModel @Inject constructor(
     val jumpDataFlow: StateFlow<FloatArray> get() = _jumpDataFlow
 
     private var snapshots = mutableListOf<Snapshot>()
+
+    //dialog
+    private val dialogFactory = DialogFactory()
+    private val _isStopJumpDialogOpen = MutableStateFlow(false)
+    val isStopJumpDialogOpen: StateFlow<Boolean> get() = _isStopJumpDialogOpen
+    val stopJumpDialogConfig: DialogConfig? =
+        dialogFactory.create(
+            state = DialogConfigState.InputJumpName,
+            onConfirm = { name -> saveJump(name!!) },
+            onDismiss = { _isStopJumpDialogOpen.value = false }
+        )
 
     // timer
     private var startTime: Long? = null
@@ -88,6 +102,13 @@ class MainViewModel @Inject constructor(
         snapshots.clear()
     }
 
+    private fun saveJump(name: String) {
+        viewModelScope.launch {
+            val jump = Jump(0,0.0,0,0)
+            jumpsRepository.saveJumpWithSnapshots(jump, snapshots)
+        }
+    }
+
 
     init {
         combine(
@@ -130,10 +151,7 @@ class MainViewModel @Inject constructor(
                     timestamp = System.currentTimeMillis(),
                     jumpId = 0
                 )
-                viewModelScope.launch {
-                    val jump = Jump(0,0.0,0,0)
-                    jumpsRepository.saveJumpWithSnapshots(jump, snapshots)
-                }
+                _isStopJumpDialogOpen.value = true
             }
             MainScreenEvent.StartJumpMeter -> {
                 _isCountdownRunning.value = true
