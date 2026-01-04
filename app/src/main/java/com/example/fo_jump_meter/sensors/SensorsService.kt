@@ -60,7 +60,7 @@ class SensorsService: Service() {
         sensorsClient
             .getSensorUpdates(
                 Sensor.TYPE_LINEAR_ACCELERATION,
-                SensorManager.SENSOR_DELAY_GAME
+                SensorManager.SENSOR_DELAY_FASTEST
             )
             .catch{e -> e.printStackTrace()}
             .onEach {
@@ -77,7 +77,7 @@ class SensorsService: Service() {
         sensorsClient
             .getSensorUpdates(
                 Sensor.TYPE_GAME_ROTATION_VECTOR,
-                SensorManager.SENSOR_DELAY_GAME
+                SensorManager.SENSOR_DELAY_FASTEST
             )
             .catch{e -> e.printStackTrace()}
             .onEach { event ->

@@ -95,7 +95,7 @@ class JumpCalculator(
         return result
     }
     fun detectLanding(acc: Float): Boolean {
-        return (currentVelocity < -0.5 && abs(acc) > 10.0) || currentHeight <= 0.0
+        return (currentVelocity < -0.5 && acc > 10.0)
     }
 
     fun detectTakeoff(acc: Float): Boolean {
