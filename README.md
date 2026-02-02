@@ -122,6 +122,7 @@ This is a measurement/estimation tool—not a calibrated lab instrument.
 ---
 
 ## Demo
+[Watch demo](./demo.mp4)
 
 
 
